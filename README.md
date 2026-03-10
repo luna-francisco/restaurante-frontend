@@ -1,16 +1,36 @@
-# React + Vite
+# Restaurante Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Proyecto final de Cliente de Desarrollo de Aplicaciones Web.
 
-Currently, two official plugins are available:
+Aplicación web en React que consume la API del proyecto restaurante-backend.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Backend
 
-## React Compiler
+Clonar repositorio:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+git clone https://github.com/luna-francisco/restaurante-backend.git
 
-## Expanding the ESLint configuration
+Ejecutar contenedores:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+docker compose up -d
+
+API disponible en:
+
+http://localhost:4000
+
+Endpoints disponibles:
+
+/restaurants
+/dishes
+/orders
+/customers
+
+## Frontend
+
+Instalar dependencias:
+
+npm install
+
+Ejecutar aplicación:
+
+npm run dev 
