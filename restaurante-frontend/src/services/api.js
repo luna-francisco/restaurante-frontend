@@ -1,8 +1,51 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
+const RAW_API_BASE_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:4000";
+const API_BASE_URL = RAW_API_BASE_URL.replace(/\/+$/, "");
+const API_FALLBACK_BASE_URL =
+  API_BASE_URL.endsWith("/api") ? API_BASE_URL : `${API_BASE_URL}/api`;
+const API_BASE_CANDIDATES = Array.from(
+  new Set([API_BASE_URL, API_FALLBACK_BASE_URL].filter(Boolean))
+);
 
-const buildUrl = (path) => {
-  if (!path.startsWith("/")) return `${API_BASE_URL}/${path}`;
-  return `${API_BASE_URL}${path}`;
+let resolvedBaseUrl = "";
+let resolvePromise = null;
+
+const probeBaseUrl = async (baseUrl) => {
+  try {
+    const response = await fetch(`${baseUrl}/health`, {
+      method: "GET",
+      cache: "no-store",
+    });
+    if (response.ok) return baseUrl;
+  } catch (error) {
+    // Ignore probe failures and try the next candidate.
+  }
+  return "";
+};
+
+const resolveBaseUrl = async () => {
+  for (const candidate of API_BASE_CANDIDATES) {
+    const detected = await probeBaseUrl(candidate);
+    if (detected) return detected;
+  }
+  return API_BASE_URL;
+};
+
+const getBaseUrl = async () => {
+  if (resolvedBaseUrl) return resolvedBaseUrl;
+  if (!resolvePromise) {
+    resolvePromise = resolveBaseUrl().then((base) => {
+      resolvedBaseUrl = base;
+      return base;
+    });
+  }
+  return resolvePromise;
+};
+
+const buildUrl = async (path) => {
+  const baseUrl = await getBaseUrl();
+  if (!path.startsWith("/")) return `${baseUrl}/${path}`;
+  return `${baseUrl}${path}`;
 };
 
 const normalizeList = (data) =>
@@ -98,7 +141,8 @@ const parseErrorMessage = async (response) => {
 };
 
 const fetchJson = async (path, options = {}) => {
-  const response = await fetch(buildUrl(path), {
+  const url = await buildUrl(path);
+  const response = await fetch(url, {
     headers: {
       "Content-Type": "application/json",
       ...(options.headers || {}),
