@@ -9,11 +9,6 @@
 - Uso de hooks: useEffect y useState.
 - Uso de React Router si hay varias páginas.
 
-## Interfaz de usuario
-- Diseño responsive para móvil y escritorio.
-- Actualización dinámica sin recargar (useState).
-- React Router si hay varias URL.
-- Recomendado: framework CSS y componentes de terceros para tablas.
 
 ## Despliegue
 - Bundler: Vite.
