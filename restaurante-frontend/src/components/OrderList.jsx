@@ -2,10 +2,15 @@ import { useEffect, useState } from "react";
 import { getOrders } from "../services/api";
 
 const getOrderLabel = (order, index) =>
-  order?.code ||
-  order?.codigo ||
-  order?.reference ||
-  `Pedido ${order?.id ?? index + 1}`;
+  `Pedido ${order?.pedidoID ?? index + 1}`;
+
+const getCustomerName = (customer) => {
+  if (!customer) return "";
+  const fullName = [customer.nombre, customer.apellido1, customer.apellido2]
+    .filter(Boolean)
+    .join(" ");
+  return fullName || `Cliente ${customer?.clienteID ?? ""}`.trim();
+};
 
 const normalizeList = (data) =>
   Array.isArray(data) ? data : data?.data ? data.data : [];
@@ -52,21 +57,31 @@ function OrderList({ items, loading: loadingProp, error: errorProp }) {
   if (!orders?.length) return <p className="state">No hay pedidos.</p>;
 
   return (
-    <div className="grid grid--compact">
-      {orders.map((order, index) => (
-        <article
-          key={order?.id ?? order?.pedidoID ?? index}
-          className="card"
-        >
-          <h3>{getOrderLabel(order, index)}</h3>
-          {order?.date && <p>Fecha: {order.date}</p>}
-          {order?.fecha && <p>Fecha: {order.fecha}</p>}
-          {order?.status && <p>Estado: {order.status}</p>}
-          {order?.estado && <p>Estado: {order.estado}</p>}
-          {order?.total && <p>Total: {order.total}</p>}
-          {order?.monto && <p>Total: {order.monto}</p>}
-        </article>
-      ))}
+    <div className="table-shell">
+      <table className="table">
+        <thead>
+          <tr>
+            <th>Pedido</th>
+            <th>Fecha</th>
+            <th>Cliente</th>
+          </tr>
+        </thead>
+        <tbody>
+          {orders.map((order, index) => (
+            <tr key={order?.pedidoID ?? index}>
+              <td>{getOrderLabel(order, index)}</td>
+              <td>{order?.fecha || "—"}</td>
+              <td>
+                {order?.customer
+                  ? getCustomerName(order.customer)
+                  : order?.clienteID
+                  ? `Cliente ${order.clienteID}`
+                  : "—"}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

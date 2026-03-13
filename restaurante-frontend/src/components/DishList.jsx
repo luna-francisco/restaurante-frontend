@@ -2,11 +2,7 @@ import { useEffect, useState } from "react";
 import { getDishes } from "../services/api";
 
 const getDishName = (dish, index) =>
-  dish?.name ||
-  dish?.nombre ||
-  dish?.plato ||
-  dish?.title ||
-  `Plato ${index + 1}`;
+  dish?.plato || `Plato ${dish?.platoID ?? index + 1}`;
 
 const normalizeList = (data) =>
   Array.isArray(data) ? data : data?.data ? data.data : [];
@@ -53,15 +49,29 @@ function DishList({ items, loading: loadingProp, error: errorProp }) {
   if (!dishes?.length) return <p className="state">No hay platos.</p>;
 
   return (
-    <div className="grid grid--compact">
-      {dishes.map((dish, index) => (
-        <article key={dish?.id ?? index} className="card">
-          <h3>{getDishName(dish, index)}</h3>
-          {(dish?.price ?? dish?.precio) && (
-            <p>Precio: {dish?.price ?? dish?.precio}</p>
-          )}
-        </article>
-      ))}
+    <div className="table-shell">
+      <table className="table">
+        <thead>
+          <tr>
+            <th>Plato</th>
+            <th>Descripción</th>
+            <th className="table__num">Precio</th>
+          </tr>
+        </thead>
+        <tbody>
+          {dishes.map((dish, index) => (
+            <tr key={dish?.platoID ?? index}>
+              <td>{getDishName(dish, index)}</td>
+              <td>{dish?.descripcion || "—"}</td>
+              <td className="table__num">
+                {dish?.precio !== null && dish?.precio !== undefined
+                  ? dish.precio
+                  : "—"}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

@@ -1,50 +1,29 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import DishList from "../components/DishList";
 import OrderList from "../components/OrderList";
 import CustomerList from "../components/CustomerList";
-import {
-  getCustomers,
-  getDishes,
-  getOrders,
-  getRestaurant,
-  getRestaurants,
-} from "../services/api";
+import { getCustomers, getDishes, getOrders, getRestaurant } from "../services/api";
 
 const getRestaurantName = (restaurant) =>
   restaurant?.name ||
-  restaurant?.nombre ||
   restaurant?.restaurante ||
-  restaurant?.title ||
-  `Restaurante ${restaurant?.id ?? ""}`.trim();
+  `Restaurante ${restaurant?.id ?? restaurant?.restauranteID ?? ""}`.trim();
 
-const normalizeList = (data) =>
-  Array.isArray(data) ? data : data?.data ? data.data : [];
+const getDishRestaurantId = (dish) =>
+  dish?.restaurantId ?? dish?.restauranteID ?? dish?.restauranteId;
 
-const getRestaurantId = (restaurant, fallback) =>
-  restaurant?.id ??
-  restaurant?.restauranteID ??
-  restaurant?.restauranteId ??
-  restaurant?.restaurantId ??
-  fallback;
-
-const getRelatedRestaurantId = (item) =>
-  item?.restaurantId ??
-  item?.restauranteId ??
-  item?.restauranteID ??
-  item?.restaurant_id;
+const getOrderRestaurantId = (order) =>
+  order?.restaurantId ?? order?.restauranteID ?? order?.restauranteId;
 
 const getOrderCustomerId = (order) =>
-  order?.customerId ??
-  order?.clienteID ??
-  order?.clienteId ??
-  order?.customer_id ??
-  order?.cliente_id ??
-  order?.customer?.id ??
-  order?.cliente?.id;
+  order?.customerId ?? order?.clienteID ?? order?.clienteId;
+
+const getCustomerId = (customer) => customer?.id ?? customer?.clienteID;
 
 function RestaurantDetail() {
   const { id } = useParams();
+  const restaurantId = useMemo(() => String(id), [id]);
   const [restaurant, setRestaurant] = useState(null);
   const [dishes, setDishes] = useState([]);
   const [orders, setOrders] = useState([]);
@@ -57,18 +36,7 @@ function RestaurantDetail() {
     const loadData = async () => {
       try {
         setLoading(true);
-        let restaurantData = null;
-        try {
-          restaurantData = await getRestaurant(id);
-        } catch (err) {
-          const listData = await getRestaurants();
-          const list = normalizeList(listData);
-          restaurantData =
-            list.find(
-              (item) =>
-                String(item?.id ?? item?.restaurantId) === String(id)
-            ) || null;
-        }
+        const restaurantData = await getRestaurant(id);
 
         const [dishesData, ordersData, customersData] = await Promise.all([
           getDishes(),
@@ -77,47 +45,39 @@ function RestaurantDetail() {
         ]);
 
         if (!isMounted) return;
-        const restaurantIdValue = getRestaurantId(restaurantData, id);
-        const allDishes = normalizeList(dishesData);
-        const allOrders = normalizeList(ordersData);
-        const allCustomers = normalizeList(customersData);
+        const allDishes = Array.isArray(dishesData) ? dishesData : [];
+        const allOrders = Array.isArray(ordersData) ? ordersData : [];
+        const allCustomers = Array.isArray(customersData) ? customersData : [];
 
-        const filteredDishes = restaurantIdValue
-          ? allDishes.filter(
-              (dish) =>
-                String(getRelatedRestaurantId(dish)) ===
-                String(restaurantIdValue)
-            )
-          : [];
+        const filteredDishes = allDishes.filter(
+          (dish) => String(getDishRestaurantId(dish)) === restaurantId
+        );
 
-        const filteredOrders = restaurantIdValue
-          ? allOrders.filter(
-              (order) =>
-                String(getRelatedRestaurantId(order)) ===
-                String(restaurantIdValue)
-            )
-          : [];
+        const filteredOrders = allOrders.filter(
+          (order) => String(getOrderRestaurantId(order)) === restaurantId
+        );
 
         const customersById = new Map(
-          allCustomers.map((customer) => [String(customer?.id), customer])
+          allCustomers.map((customer) => [String(getCustomerId(customer)), customer])
         );
-        const customerMap = new Map();
 
-        filteredOrders.forEach((order) => {
-          const orderCustomer = order?.customer || order?.cliente;
-          if (orderCustomer?.id) {
-            customerMap.set(String(orderCustomer.id), orderCustomer);
-          }
-          const customerId = getOrderCustomerId(order);
+        const ordersWithCustomer = filteredOrders.map((order) => ({
+          ...order,
+          customer: customersById.get(String(getOrderCustomerId(order))) || null,
+        }));
+
+        const customerMap = new Map();
+        ordersWithCustomer.forEach((order) => {
+          const customer = order.customer;
+          const customerId = getCustomerId(customer);
           if (customerId !== undefined) {
-            const fromList = customersById.get(String(customerId));
-            if (fromList) customerMap.set(String(customerId), fromList);
+            customerMap.set(String(customerId), customer);
           }
         });
 
         setRestaurant(restaurantData);
         setDishes(filteredDishes);
-        setOrders(filteredOrders);
+        setOrders(ordersWithCustomer);
         setCustomers(Array.from(customerMap.values()));
         setError("");
       } catch (err) {
@@ -139,11 +99,23 @@ function RestaurantDetail() {
 
   return (
     <div className="page">
-      <header className="page__header">
-        <div className="page__nav">
-          <Link to="/">Volver</Link>
+      <header className="hero hero--compact">
+        <div className="hero__meta">
+          <span className="hero__chip">Edición 2026</span>
+          <span className="hero__tag">Ficha de restaurante</span>
         </div>
-        <h1>{loading ? "Cargando..." : getRestaurantName(restaurant)}</h1>
+        <h1 className="hero__title">
+          {loading ? "Cargando..." : getRestaurantName(restaurant)}
+        </h1>
+        <p className="hero__subtitle">
+          Resumen completo de platos, pedidos y clientes asociados.
+        </p>
+        <div className="hero__actions">
+          <Link className="hero__back" to="/">
+            Volver al listado
+          </Link>
+        </div>
+        <div className="hero__glow" aria-hidden="true" />
       </header>
 
       {loading && <p className="state">Cargando restaurante...</p>}
@@ -167,46 +139,22 @@ function RestaurantDetail() {
           </section>
 
           <div className="card info-card">
-          <div className="card__row">
-            <span className="card__label">ID</span>
-            <span>{restaurant.id ?? id}</span>
-          </div>
-          {restaurant.address && (
             <div className="card__row">
-              <span className="card__label">Dirección</span>
-              <span>{restaurant.address}</span>
+              <span className="card__label">ID</span>
+              <span>{restaurant.id ?? restaurant.restauranteID ?? id}</span>
             </div>
-          )}
-          {restaurant.direccion && (
-            <div className="card__row">
-              <span className="card__label">Dirección</span>
-              <span>{restaurant.direccion}</span>
-            </div>
-          )}
-          {restaurant.phone && (
-            <div className="card__row">
-              <span className="card__label">Teléfono</span>
-              <span>{restaurant.phone}</span>
-            </div>
-          )}
-          {restaurant.telefono && (
-            <div className="card__row">
-              <span className="card__label">Teléfono</span>
-              <span>{restaurant.telefono}</span>
-            </div>
-          )}
-          {restaurant.cuisine && (
-            <div className="card__row">
-              <span className="card__label">Tipo</span>
-              <span>{restaurant.cuisine}</span>
-            </div>
-          )}
-          {restaurant.tipo && (
-            <div className="card__row">
-              <span className="card__label">Tipo</span>
-              <span>{restaurant.tipo}</span>
-            </div>
-          )}
+            {restaurant.address && (
+              <div className="card__row">
+                <span className="card__label">Dirección</span>
+                <span>{restaurant.address}</span>
+              </div>
+            )}
+            {restaurant.barrio && (
+              <div className="card__row">
+                <span className="card__label">Barrio</span>
+                <span>{restaurant.barrio}</span>
+              </div>
+            )}
           </div>
         </>
       )}

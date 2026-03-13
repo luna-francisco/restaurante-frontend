@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { getCustomers } from "../services/api";
 
-const getCustomerName = (customer, index) =>
-  customer?.name ||
-  customer?.nombre ||
-  customer?.fullName ||
-  `Cliente ${customer?.id ?? index + 1}`;
+const getCustomerName = (customer, index) => {
+  const fullName = [customer?.nombre, customer?.apellido1, customer?.apellido2]
+    .filter(Boolean)
+    .join(" ");
+  return fullName || `Cliente ${customer?.clienteID ?? index + 1}`;
+};
 
 const normalizeList = (data) =>
   Array.isArray(data) ? data : data?.data ? data.data : [];
@@ -53,19 +54,25 @@ function CustomerList({ items, loading: loadingProp, error: errorProp }) {
   if (!customers?.length) return <p className="state">No hay clientes.</p>;
 
   return (
-    <div className="grid grid--compact">
-      {customers.map((customer, index) => (
-        <article
-          key={customer?.id ?? customer?.clienteID ?? index}
-          className="card"
-        >
-          <h3>{getCustomerName(customer, index)}</h3>
-          {customer?.email && <p>{customer.email}</p>}
-          {customer?.correo && <p>{customer.correo}</p>}
-          {customer?.phone && <p>{customer.phone}</p>}
-          {customer?.telefono && <p>{customer.telefono}</p>}
-        </article>
-      ))}
+    <div className="table-shell">
+      <table className="table">
+        <thead>
+          <tr>
+            <th>Cliente</th>
+            <th>Sexo</th>
+            <th>Ciudad</th>
+          </tr>
+        </thead>
+        <tbody>
+          {customers.map((customer, index) => (
+            <tr key={customer?.clienteID ?? index}>
+              <td>{getCustomerName(customer, index)}</td>
+              <td>{customer?.sexo || "—"}</td>
+              <td>{customer?.poblacion || "—"}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

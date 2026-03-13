@@ -31,9 +31,34 @@ function Home() {
 
   return (
     <div className="page">
-      <header className="page__header">
-        <h1>Restaurantes</h1>
-        <p>Selecciona un restaurante para ver sus datos.</p>
+      <header className="hero hero--home">
+        <div className="hero__meta">
+          <span className="hero__chip">Edición 2026</span>
+          <span className="hero__tag">Directorio gastronómico</span>
+        </div>
+        <h1 className="hero__title">Restaurantes</h1>
+        <p className="hero__subtitle">
+          Selecciona un restaurante para explorar sus platos, pedidos y clientes.
+        </p>
+        <div className="hero__stats">
+          <div className="hero__stat">
+            <span className="hero__stat-label">Restaurantes</span>
+            <span className="hero__stat-value">
+              {loading ? "…" : restaurants.length}
+            </span>
+          </div>
+          <div className="hero__stat">
+            <span className="hero__stat-label">Acceso</span>
+            <span className="hero__stat-value">Directo</span>
+          </div>
+          <div className="hero__stat">
+            <span className="hero__stat-label">Estado</span>
+            <span className="hero__stat-value">
+              {error ? "Revisar API" : "Sincronizado"}
+            </span>
+          </div>
+        </div>
+        <div className="hero__glow" aria-hidden="true" />
       </header>
 
       <RestaurantList
