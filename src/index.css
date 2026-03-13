@@ -1,68 +1,70 @@
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap");
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
+  font-family: "Plus Jakarta Sans", "Segoe UI", Arial, sans-serif;
+  line-height: 1.55;
   font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
+  color: #0b0d12;
+  background-color: #f5f7fb;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  background: radial-gradient(circle at top left, #f7f8ff 0%, #eef2f9 40%, #e8f1ff 100%);
+  color: inherit;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  width: 520px;
+  height: 520px;
+  z-index: -2;
+  filter: blur(6px);
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+body::before {
+  top: -180px;
+  right: -200px;
+  background: radial-gradient(circle, rgba(75, 115, 255, 0.22) 0%, rgba(75, 115, 255, 0) 70%);
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+body::after {
+  bottom: -220px;
+  left: -220px;
+  background: radial-gradient(circle, rgba(0, 203, 214, 0.2) 0%, rgba(0, 203, 214, 0) 70%);
+}
+
+body::selection {
+  background: rgba(75, 115, 255, 0.2);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0 0 0.75rem;
+  font-family: "Space Grotesk", "Segoe UI", sans-serif;
+  letter-spacing: -0.035em;
+}
+
+p {
+  margin: 0 0 0.75rem;
 }
