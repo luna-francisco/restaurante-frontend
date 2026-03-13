@@ -4,17 +4,34 @@ const mysql = require('mysql2')
 require('dotenv').config()
 
 const app = express()
-app.use(cors())
-const port = 3000
+
+const parseCorsOrigins = (value) => {
+  if (!value) return null
+  const list = value
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean)
+  return list.length ? list : null
+}
+
+const corsOrigins = parseCorsOrigins(process.env.CORS_ORIGIN)
+app.use(
+  cors({
+    origin: corsOrigins || '*',
+  })
+)
+
+const port = process.env.PORT || 3000
 let db
 
 // Function to establish a connection with retries
 function connectWithRetry() {
   db = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
+    host: process.env.DB_HOST || process.env.MYSQLHOST,
+    user: process.env.DB_USER || process.env.MYSQLUSER,
+    password: process.env.DB_PASSWORD || process.env.MYSQLPASSWORD,
+    database: process.env.DB_NAME || process.env.MYSQLDATABASE,
+    port: process.env.DB_PORT || process.env.MYSQLPORT || 3306,
   })
 
   // Attempt to connect
@@ -45,6 +62,10 @@ app.get('/categories', (req, res) => {
       res.json(results)
     }
   })
+})
+
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok' })
 })
 
 // Get all restaurants
