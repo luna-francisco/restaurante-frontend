@@ -53,19 +53,35 @@ function CustomerList({ items, loading: loadingProp, error: errorProp }) {
   if (!customers?.length) return <p className="state">No hay clientes.</p>;
 
   return (
-    <div className="grid grid--compact">
-      {customers.map((customer, index) => (
-        <article
-          key={customer?.id ?? customer?.clienteID ?? index}
-          className="card"
-        >
-          <h3>{getCustomerName(customer, index)}</h3>
-          {customer?.email && <p>{customer.email}</p>}
-          {customer?.correo && <p>{customer.correo}</p>}
-          {customer?.phone && <p>{customer.phone}</p>}
-          {customer?.telefono && <p>{customer.telefono}</p>}
-        </article>
-      ))}
+    <div className="card table-card">
+      <div className="table-scroll">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Apellido 1</th>
+              <th>Apellido 2</th>
+              <th>Sexo</th>
+              <th>Población</th>
+            </tr>
+          </thead>
+          <tbody>
+            {customers.map((customer, index) => (
+              <tr
+                key={customer?.id ?? customer?.clienteID ?? index}
+              >
+                <td>{customer?.id ?? customer?.clienteID ?? "-"}</td>
+                <td>{customer?.nombre ?? customer?.name ?? "-"}</td>
+                <td>{customer?.apellido1 ?? "-"}</td>
+                <td>{customer?.apellido2 ?? "-"}</td>
+                <td>{customer?.sexo ?? "-"}</td>
+                <td>{customer?.poblacion ?? "-"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

@@ -53,15 +53,38 @@ function DishList({ items, loading: loadingProp, error: errorProp }) {
   if (!dishes?.length) return <p className="state">No hay platos.</p>;
 
   return (
-    <div className="grid grid--compact">
-      {dishes.map((dish, index) => (
-        <article key={dish?.id ?? index} className="card">
-          <h3>{getDishName(dish, index)}</h3>
-          {(dish?.price ?? dish?.precio) && (
-            <p>Precio: {dish?.price ?? dish?.precio}</p>
-          )}
-        </article>
-      ))}
+    <div className="card table-card">
+      <div className="table-scroll">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Plato</th>
+              <th>Descripción</th>
+              <th>Precio</th>
+              <th>Categoría</th>
+              <th>Restaurante</th>
+            </tr>
+          </thead>
+          <tbody>
+            {dishes.map((dish, index) => (
+              <tr key={dish?.id ?? dish?.platoID ?? index}>
+                <td>{dish?.id ?? dish?.platoID ?? "-"}</td>
+                <td>{getDishName(dish, index)}</td>
+                <td>{dish?.descripcion ?? "-"}</td>
+                <td>{dish?.price ?? dish?.precio ?? "-"}</td>
+                <td>{dish?.categoriaID ?? dish?.categoriaId ?? "-"}</td>
+                <td>
+                  {dish?.restaurantId ??
+                    dish?.restauranteID ??
+                    dish?.restauranteId ??
+                    "-"}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

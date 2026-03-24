@@ -27,15 +27,10 @@ const normalizeRestaurant = (restaurant = {}) => {
     restaurant.nombre ??
     restaurant.restaurante ??
     restaurant.title;
-  const address =
-    restaurant.address ??
-    restaurant.direccion ??
-    normalizeBarrio(restaurant.barrio);
   return {
     ...restaurant,
     id,
     name,
-    address,
     barrio: normalizeBarrio(restaurant.barrio),
   };
 };

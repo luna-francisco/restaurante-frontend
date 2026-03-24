@@ -171,16 +171,10 @@ function RestaurantDetail() {
             <span className="card__label">ID</span>
             <span>{restaurant.id ?? id}</span>
           </div>
-          {restaurant.address && (
+          {restaurant.barrio && (
             <div className="card__row">
-              <span className="card__label">Dirección</span>
-              <span>{restaurant.address}</span>
-            </div>
-          )}
-          {restaurant.direccion && (
-            <div className="card__row">
-              <span className="card__label">Dirección</span>
-              <span>{restaurant.direccion}</span>
+              <span className="card__label">Barrio</span>
+              <span>{restaurant.barrio}</span>
             </div>
           )}
           {restaurant.phone && (

@@ -15,29 +15,39 @@ function RestaurantList({ restaurants, loading, error }) {
 
   return (
     <section className="page__section">
-      <div className="grid grid--restaurants">
-        {restaurants.map((restaurant, index) => (
-          <article
-            key={restaurant?.id ?? restaurant?.restauranteID ?? index}
-            className="card card--link card--restaurant"
-          >
-            <div>
-              <h3>{getRestaurantName(restaurant, index)}</h3>
-              {restaurant?.address && <p>{restaurant.address}</p>}
-              {restaurant?.direccion && <p>{restaurant.direccion}</p>}
-              {restaurant?.barrio && <p>{restaurant.barrio}</p>}
-              {restaurant?.cuisine && <p>{restaurant.cuisine}</p>}
-              {restaurant?.tipo && <p>{restaurant.tipo}</p>}
-            </div>
-            <Link
-              to={`/restaurant/${
-                restaurant?.id ?? restaurant?.restauranteID ?? index
-              }`}
-            >
-              Ver detalles
-            </Link>
-          </article>
-        ))}
+      <div className="card table-card">
+        <div className="table-scroll">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Restaurante</th>
+                <th>Barrio</th>
+                <th>Detalles</th>
+              </tr>
+            </thead>
+            <tbody>
+              {restaurants.map((restaurant, index) => (
+                <tr
+                  key={restaurant?.id ?? restaurant?.restauranteID ?? index}
+                >
+                  <td>{restaurant?.id ?? restaurant?.restauranteID ?? "-"}</td>
+                  <td>{getRestaurantName(restaurant, index)}</td>
+                  <td>{restaurant?.barrio ?? "-"}</td>
+                  <td>
+                    <Link
+                      to={`/restaurant/${
+                        restaurant?.id ?? restaurant?.restauranteID ?? index
+                      }`}
+                    >
+                      Ver
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
   );
